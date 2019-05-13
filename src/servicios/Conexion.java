@@ -16,18 +16,28 @@ import java.sql.SQLException;
  * @author kuroy
  */
 public class Conexion {
+    private final String DRIVER = "com.mysql.jdbc.Driver";
+    private final String URLDATABASE = "jdbc:mysql://localhost/tienda";
+    private final String USER = "root";
+    private final String PASSWORD = "";
     private static Connection cnx = null;
     private static PreparedStatement ps  = null;
 
     public Conexion() throws SQLException, ClassNotFoundException{
-        cnx = obtener();
+        cnx = conectar();
     }
     
-    private Connection obtener() throws SQLException, ClassNotFoundException{
+    /**
+     * Se conecta a la base de datos y me retorna la connection
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    private Connection conectar() throws SQLException, ClassNotFoundException{
         if(cnx == null){
             try{
-                Class.forName("com.mysql.jdbc.Driver");
-                cnx = DriverManager.getConnection("jdbc:mysql://localhost/tienda", "root", "");
+                Class.forName(DRIVER);
+                cnx = DriverManager.getConnection(URLDATABASE, USER, PASSWORD);
             }catch(SQLException e){
                 throw new SQLException(e);
             }catch(ClassNotFoundException c){
@@ -37,6 +47,15 @@ public class Conexion {
         return cnx;
     }
     
+    /**
+     * Sirve para realizar una consulta en general, con el param "table" me ubico
+     * en la tabla que quiero buscar y con el param "id" busco en la tabla
+     * el elemento o elementos con dicho "id"(nunca he usado este metodo desde que lo cree xd pero sirve)
+     * @param table
+     * @param id
+     * @return
+     * @throws SQLException 
+     */
     public ResultSet consulta(String table, String id)throws SQLException{
         ps = cnx.prepareStatement("SELECT * FROM "+table+" WHERE id="+id);
         ResultSet rs = ps.executeQuery();
@@ -46,10 +65,17 @@ public class Conexion {
         return null;
     }
   
+    /**
+     * Retorna la conexion
+     * @return 
+     */
     public Connection getConnection(){
         return cnx;
     }
     
+    /**
+     * Cierra la conexion
+     */
     public static void cerrar(){
         if(cnx!=null){
             try{
